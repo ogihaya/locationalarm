@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#D0BCFF</color>
+    <string name="add_alarm">アラームを追加</string>
+    <string name="alarm_name">アラーム名</string>
+    <string name="alarm_notification_channel_description">アラームの鳴動通知</string>
+    <string name="alarm_notification_channel_name">アラーム通知</string>
+    <string name="alarm_permission_required">正確なアラームの許可が必要です</string>
+    <string name="alarm_ringing">アラーム</string>
+    <string name="alarm_time">時刻</string>
+    <string name="app_name">位置アラーム</string>
+    <string name="cancel">キャンセル</string>
+    <string name="cannot_delete_outside">目的地の範囲外では削除できません</string>
+    <string name="cannot_edit_outside">目的地の範囲外では編集できません</string>
+    <string name="delete_alarm">アラームを削除</string>
+    <string name="destination">目的地</string>
+    <string name="distance_remaining">残り %1$d m</string>
+    <string name="edit_alarm">アラームを編集</string>
+    <string name="grant_permission">許可する</string>
+    <string name="location_permission_required">位置情報の許可が必要です</string>
+    <string name="location_required">目的地に到着してください</string>
+    <string name="no_alarms">アラームがありません</string>
+    <string name="notification_permission_required">通知の許可が必要です</string>
+    <string name="save">保存</string>
+    <string name="select_destination">マップをタップして目的地を選択</string>
+    <string name="stop_alarm">停止</string>
+    <string name="tap_to_open">タップして開く</string>
+    <style name="Theme.LocationAlarm" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>
