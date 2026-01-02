@@ -37,13 +37,18 @@ class AddEditAlarmViewModel @Inject constructor(
         if (alarmId != null && alarmId > 0) {
             loadAlarm(alarmId)
         } else {
-            // Set default time to current time + 1 hour
+            // Set default time to current time
             val calendar = Calendar.getInstance()
+            // Default 1 hour later
             calendar.add(Calendar.HOUR_OF_DAY, 1)
+            
             _uiState.update {
                 it.copy(
                     timeHour = calendar.get(Calendar.HOUR_OF_DAY),
-                    timeMinute = calendar.get(Calendar.MINUTE)
+                    timeMinute = calendar.get(Calendar.MINUTE),
+                    dateYear = calendar.get(Calendar.YEAR),
+                    dateMonth = calendar.get(Calendar.MONTH),
+                    dateDay = calendar.get(Calendar.DAY_OF_MONTH)
                 )
             }
         }
@@ -63,6 +68,9 @@ class AddEditAlarmViewModel @Inject constructor(
                         name = alarm.name,
                         timeHour = calendar.get(Calendar.HOUR_OF_DAY),
                         timeMinute = calendar.get(Calendar.MINUTE),
+                        dateYear = calendar.get(Calendar.YEAR),
+                        dateMonth = calendar.get(Calendar.MONTH),
+                        dateDay = calendar.get(Calendar.DAY_OF_MONTH),
                         destination = LatLng(alarm.latitude, alarm.longitude),
                         radius = alarm.radius,
                         isLoading = false,
@@ -85,6 +93,16 @@ class AddEditAlarmViewModel @Inject constructor(
         _uiState.update { it.copy(timeHour = hour, timeMinute = minute) }
     }
 
+    fun updateDate(year: Int, month: Int, day: Int) {
+        _uiState.update { 
+            it.copy(
+                dateYear = year, 
+                dateMonth = month, 
+                dateDay = day
+            ) 
+        }
+    }
+
     fun updateDestination(latLng: LatLng) {
         _uiState.update { it.copy(destination = latLng) }
     }
@@ -105,14 +123,17 @@ class AddEditAlarmViewModel @Inject constructor(
             _uiState.update { it.copy(isSaving = true) }
 
             val calendar = Calendar.getInstance().apply {
+                set(Calendar.YEAR, state.dateYear)
+                set(Calendar.MONTH, state.dateMonth)
+                set(Calendar.DAY_OF_MONTH, state.dateDay)
                 set(Calendar.HOUR_OF_DAY, state.timeHour)
                 set(Calendar.MINUTE, state.timeMinute)
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
 
-                // If the time is in the past, set it to tomorrow
+                // If the time is in the past, set it to next year same date/time
                 if (timeInMillis <= System.currentTimeMillis()) {
-                    add(Calendar.DAY_OF_YEAR, 1)
+                    add(Calendar.YEAR, 1)
                 }
             }
 

@@ -8,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
@@ -22,6 +23,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import java.util.Calendar
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -38,6 +40,7 @@ fun AddEditAlarmScreen(
     val scope = rememberCoroutineScope()
 
     var showTimePicker by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
 
     // Default location (Tokyo)
     val defaultLocation = LatLng(35.6762, 139.6503)
@@ -169,6 +172,41 @@ fun AddEditAlarmScreen(
                                 )
                                 Text(
                                     text = String.format("%02d:%02d", uiState.timeHour, uiState.timeMinute),
+                                    style = MaterialTheme.typography.headlineMedium
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Date Picker
+                    Card(
+                        onClick = { showDatePicker = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Default.DateRange,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column {
+                                Text(
+                                    "日付",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.outline
+                                )
+                                Text(
+                                    text = String.format("%04d/%02d/%02d", uiState.dateYear, uiState.dateMonth + 1, uiState.dateDay),
                                     style = MaterialTheme.typography.headlineMedium
                                 )
                             }
@@ -343,6 +381,44 @@ fun AddEditAlarmScreen(
                 }
             }
         )
+    }
+
+    // Date Picker Dialog
+    if (showDatePicker) {
+        val calendar = Calendar.getInstance()
+        calendar.set(uiState.dateYear, uiState.dateMonth, uiState.dateDay)
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = calendar.timeInMillis
+        )
+
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            val selectedCalendar = Calendar.getInstance()
+                            selectedCalendar.timeInMillis = millis
+                            viewModel.updateDate(
+                                selectedCalendar.get(Calendar.YEAR),
+                                selectedCalendar.get(Calendar.MONTH),
+                                selectedCalendar.get(Calendar.DAY_OF_MONTH)
+                            )
+                        }
+                        showDatePicker = false
+                    }
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("キャンセル")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
     }
 
     // Error Dialog

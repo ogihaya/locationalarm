@@ -34,7 +34,6 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    var showDeleteDialog by remember { mutableStateOf<Alarm?>(null) }
     var pendingEditAlarm by remember { mutableStateOf<Alarm?>(null) }
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -47,7 +46,7 @@ fun HomeScreen(
         }
     }
 
-    // Handle location check result
+    // Handle location check result (CanEdit)
     LaunchedEffect(uiState.locationCheckResult) {
         when (val result = uiState.locationCheckResult) {
             is LocationCheckResult.CanEdit -> {
@@ -141,7 +140,7 @@ fun HomeScreen(
                                         )
                                     }
                                 },
-                                onDelete = { showDeleteDialog = alarm }
+                                onDelete = { viewModel.deleteAlarm(alarm) }
                             )
                         }
                     }
@@ -150,12 +149,18 @@ fun HomeScreen(
         }
     }
 
-    // Location check result snackbar
+    // Handle location check result (CannotAction)
     uiState.locationCheckResult?.let { result ->
-        if (result is LocationCheckResult.CannotEdit) {
+        if (result is LocationCheckResult.CannotAction) {
+            val actionText = when (result.action) {
+                is AlarmAction.Edit -> "編集"
+                is AlarmAction.Delete -> "削除"
+                is AlarmAction.Toggle -> "設定変更"
+            }
+            
             AlertDialog(
                 onDismissRequest = { viewModel.clearLocationCheckResult() },
-                title = { Text("編集できません") },
+                title = { Text("${actionText}できません") },
                 text = { Text("目的地まであと ${result.distanceMeters}m 近づいてください") },
                 confirmButton = {
                     TextButton(onClick = { viewModel.clearLocationCheckResult() }) {
@@ -166,24 +171,23 @@ fun HomeScreen(
         }
     }
 
-    // Delete confirmation dialog
-    showDeleteDialog?.let { alarm ->
+    // Delete confirmation dialog (from ViewModel state)
+    uiState.deleteConfirmationAlarm?.let { alarm ->
         AlertDialog(
-            onDismissRequest = { showDeleteDialog = null },
+            onDismissRequest = { viewModel.cancelDelete() },
             title = { Text("削除の確認") },
             text = { Text("「${alarm.displayName}」を削除しますか？") },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        viewModel.deleteAlarm(alarm.id)
-                        showDeleteDialog = null
+                        viewModel.deleteAlarmConfirmed(alarm.id)
                     }
                 ) {
                     Text("削除", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = null }) {
+                TextButton(onClick = { viewModel.cancelDelete() }) {
                     Text("キャンセル")
                 }
             }

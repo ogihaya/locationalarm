@@ -99,9 +99,6 @@ class AlarmService : Service() {
         // Start foreground with notification
         startForeground(NOTIFICATION_ID, createNotification(alarmName))
 
-        // Launch the ringing activity
-        launchRingingActivity()
-
         // Start alarm sound and vibration loop
         handler.post(repeatRunnable)
 
@@ -147,15 +144,6 @@ class AlarmService : Service() {
                 stopPendingIntent
             )
             .build()
-    }
-
-    private fun launchRingingActivity() {
-        val intent = Intent(this, AlarmRingingActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                    Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-        startActivity(intent)
     }
 
     private fun playAlarmSound() {
