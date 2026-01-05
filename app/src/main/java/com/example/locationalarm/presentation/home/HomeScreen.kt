@@ -211,7 +211,7 @@ private fun AlarmCard(
     onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
-    val timeFormat = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
+    val timeFormat = remember { SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault()) }
 
     Card(
         onClick = onClick,
